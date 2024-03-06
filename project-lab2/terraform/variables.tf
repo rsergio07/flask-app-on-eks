@@ -1,7 +1,7 @@
 # Define variables for customization
 variable "aws_region" {
   description = "AWS region where the infrastructure will be deployed"
-  default     = "us-east-1"
+  default     = "us-east-1" # Replace with your desired AWS region
 }
 
 variable "cluster_name" {
