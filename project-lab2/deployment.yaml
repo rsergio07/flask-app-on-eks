@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: my-rest-api
-        image: <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/<repository_name>:<image_tag>
+        image: <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/<repository_name>:<image_tag>
         ports:
         - containerPort: 5000
