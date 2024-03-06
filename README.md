@@ -69,7 +69,8 @@ Replace <image_name> and <image_tag> with your desired values.
 docker tag <image_name>:<image_tag> <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/<repository_name>:<image_tag>
 ```
 
-Replace <image_name> and <image_tag> with your real values, <your-account-id> with your AWS account ID, and <your-region> with your AWS region and <repository_name> with the name of your ECR repository and <image_tag> with the tag name for your image.
+Replace <image_name> and <image_tag> with your real values, <your-account-id> with your AWS account ID, <your-region> with your AWS region, <repository_name> with the name of your ECR repository, and <image_tag> with the tag name for your image.
+
 
 ## Push Image to ECR
 
@@ -77,7 +78,7 @@ Replace <image_name> and <image_tag> with your real values, <your-account-id> wi
 docker push <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/<repository_name>:<image_tag>
 ```
 
-Replace <your-account-id> with your AWS account ID, replace <your-region> with your AWS region, replace <repository_name> with your ECR repository name and <image_tag> with the tag you specified earlier.
+Replace <your-account-id> with your AWS account ID, <your-region> with your AWS region, <repository_name> with your ECR repository name, and <image_tag> with the tag you specified earlier.
 
 ## Update deployment.yaml
 
