@@ -2,7 +2,7 @@
 
 This project demonstrates how to deploy a Flask web application onto an AWS Elastic Kubernetes Service (EKS) cluster using Terraform for infrastructure provisioning.
 
-# Files
+## Files
 
 - `main.tf`: Defines the Terraform resources for creating the EKS cluster, VPC, subnets, security group, and IAM role.
 - `variables.tf`: Defines the variables used in the Terraform configuration.
@@ -13,7 +13,7 @@ This project demonstrates how to deploy a Flask web application onto an AWS Elas
 - `Dockerfile`: Defines the Docker image for the Flask application.
 - `app.py`: Python Flask application code.
 
-# Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following:
 
@@ -22,7 +22,7 @@ Before you begin, ensure you have the following:
 - Install Terraform `https://developer.hashicorp.com/terraform/install?product_intent=terraform`
 - Install AWS CLI `https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html`
 
-# Getting Started
+## Getting Started
 
 To deploy the Flask application onto an AWS EKS cluster, follow these steps:
 
@@ -32,13 +32,13 @@ To deploy the Flask application onto an AWS EKS cluster, follow these steps:
 git clone https://github.com/rsergio07/flask-app-on-eks
 ```
 
-# Navigate to the directory containing the application files:
+## Navigate to the directory containing the application files:
 
 ```bash
 cd project-lab2
 ```
 
-# Create an ECR Repository
+## Create an ECR Repository
 
 ```bash
 aws ecr create-repository --repository-name <repository_name>
@@ -46,7 +46,7 @@ aws ecr create-repository --repository-name <repository_name>
 
 Replace <repository_name> with the desired name for your repository.
 
-# Login to ECR
+## Login to ECR
 
 ```bash
 aws ecr get-login-password --region your-region | docker login --username AWS --password-stdin your-account-id.dkr.ecr.your-region.amazonaws.com
@@ -54,7 +54,7 @@ aws ecr get-login-password --region your-region | docker login --username AWS --
 
 Replace your-region with the AWS region and your-account-id with your AWS account ID.
 
-# Build Docker Image
+## Build Docker Image
 
 ```bash
 docker build -t <image_name>:<image_tag> .
@@ -62,7 +62,7 @@ docker build -t <image_name>:<image_tag> .
 
 Replace <image_name> and <image_tag> with your desired values.
 
-# Tag the Image
+## Tag the Image
 
 ```bash
 docker tag <image_name>:<image_tag> your-account-id.dkr.ecr.your-region.amazonaws.com/<repository_name>:<image_tag>
@@ -70,7 +70,7 @@ docker tag <image_name>:<image_tag> your-account-id.dkr.ecr.your-region.amazonaw
 
 Replace <repository_name> with the name of your ECR repository and <image_tag> with the desired tag for your image.
 
-# Push Image to ECR
+## Push Image to ECR
 
 ```bash
 docker push your-account-id.dkr.ecr.your-region.amazonaws.com/<repository_name>:<image_tag>
@@ -86,13 +86,13 @@ After pushing the Docker image to your ECR repository, update the `deployment.ya
 
 To deploy the application and service on the EKS cluster, use the following commands:
 
-# Apply the deployment configuration:
+## Apply the deployment configuration:
 
 ```bash
 kubectl apply -f deployment.yaml
 ```
 
-# Apply the service configuration:
+## Apply the service configuration:
 
 ```bash
 kubectl apply -f service.yaml
@@ -108,33 +108,33 @@ Before deploying the infrastructure, please ensure Terraform is installed on you
 
 To deploy the application infrastructure using Terraform, follow these steps:
 
-# Navigate to the directory containing the Terraform files:
+## Navigate to the directory containing the Terraform files:
 
 ```bash
 cd project-lab2/terraform
 ```
 
-# Initialize the Terraform environment:
+## Initialize the Terraform environment:
 
 ```bash
 terraform init
 ```
 
-# Review the changes Terraform will make:
+## Review the changes Terraform will make:
 
 ```bash
 terraform plan
 ```
 
-# Apply the changes to create the EKS cluster and associated resources:
+## Apply the changes to create the EKS cluster and associated resources:
 
 ```bash
 terraform apply
 ```
 
-# Wait for Terraform to finish creating the resources. This may take several minutes.
+## Wait for Terraform to finish creating the resources. This may take several minutes.
 
-# Access the application
+## Access the application
 
 The output from `terraform apply` should provide the service URL. You can access your application using this URL.
 
