@@ -52,7 +52,15 @@ docker build -t <image_name>:<image_tag> .
 
 Replace `<image_name>` and `<image_tag>` with your desired values.
 
-2. Push the image to your ECR repository:
+2. Run the following command to create an ECR repository:
+
+```bash
+aws ecr create-repository --repository-name <repository_name>
+```
+
+Replace <repository_name> with the desired name for your repository.
+
+3. Push the image to your ECR repository:
 
 ```bash
 docker push <image_repository_uri>/<image_name>:<image_tag>
