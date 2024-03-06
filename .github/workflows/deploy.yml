@@ -15,7 +15,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
         with:
-          registry: 635289283142.dkr.ecr.us-east-1.amazonaws.com
+          registry: 635289283142.dkr.ecr.us-east-1.amazonaws.com/my-rest-api
           region: us-east-1
           mask-password: true
           registry-type: private
