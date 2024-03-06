@@ -134,7 +134,9 @@ terraform apply
 
 # Wait for Terraform to finish creating the resources. This may take several minutes.
 
-# Once the resources are created, you should see an output indicating the name of the EKS cluster and the URL of the deployed Flask app service.
+# Access the application
+
+The output from `terraform apply` should provide the service URL. You can access your application using this URL.
 
 ## Clean Up
 
