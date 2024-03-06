@@ -72,6 +72,10 @@ docker tag <image_name>:<image_tag> <your-account-id>.dkr.ecr.<your-region>.amaz
 
 Ensure you use the same values for `<image_name>` and `<image_tag>` as in the previous step.
 
+- Replace `<your-account-id>` with your **AWS account ID**.
+- Replace `<your-region>` with your **AWS region** (e.g., `us-east-1`).
+- Replace `<repository_name>` with your **ECR repository name**.
+- Replace `<image_tag>` with the **tag** you specified earlier.
 
 ## Push Image to ECR
 
