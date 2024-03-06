@@ -25,11 +25,15 @@ To deploy the Flask application onto an AWS EKS cluster, follow these steps:
 
 1. Clone this repository onto your local machine:
 
+```bash
 git clone https://github.com/rsergio07/flask-app-on-eks
+```
 
 2. Navigate to the directory containing the application files:
 
+```bash
 cd project-lab2
+```
 
 ## Build and Push Docker Image
 
@@ -37,13 +41,17 @@ To build and push the Docker image to your ECR repository, follow these steps:
 
 1. Build the Docker image:
 
+```bash
 docker build -t <image_name>:<image_tag> .
+```
 
 Replace `<image_name>` and `<image_tag>` with your desired values.
 
 2. Push the image to your ECR repository:
 
+```bash
 docker push <image_repository_uri>/<image_name>:<image_tag>
+```
 
 Replace `<image_repository_uri>` with your ECR repository URI.
 
@@ -57,11 +65,15 @@ To deploy the application and service on the EKS cluster, use the following comm
 
 1. Apply the deployment configuration:
 
+```bash
 kubectl apply -f deployment.yaml
+```
 
 2. Apply the service configuration:
 
+```bash
 kubectl apply -f service.yaml
+```
 
 This will deploy and expose the application via a service on the EKS cluster.
 
@@ -75,19 +87,27 @@ To deploy the application infrastructure using Terraform, follow these steps:
 
 1. Navigate to the directory containing the Terraform files:
 
+```bash
 cd project-lab2/terraform
+```
 
 2. Initialize the Terraform environment:
 
+```bash
 terraform init
+```
 
 3. Review the changes Terraform will make:
 
+```bash
 terraform plan
+```
 
 4. Apply the changes to create the EKS cluster and associated resources:
 
+```bash
 terraform apply
+```
 
 5. Wait for Terraform to finish creating the resources. This may take several minutes.
 
