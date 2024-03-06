@@ -45,7 +45,7 @@ cd project-lab2
 aws ecr create-repository --repository-name <repository_name>
 ```
 
-Replace <repository_name> with the desired name for your repository.
+Replace <repository_name> with your desired repository name.
 
 ## Login to ECR
 
@@ -53,7 +53,8 @@ Replace <repository_name> with the desired name for your repository.
 aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.your-region.amazonaws.com
 ```
 
-Replace <your-region> with the AWS region and <your-account-id> with your AWS account ID.
+Replace <your-region> with your AWS region (e.g., us-east-1).
+Replace <your-account-id> with your actual AWS account ID.
 
 # Build Docker Image
 
@@ -61,7 +62,7 @@ Replace <your-region> with the AWS region and <your-account-id> with your AWS ac
 docker build -t <image_name>:<image_tag> .
 ```
 
-Replace <image_name> and <image_tag> with your desired values.
+Replace <image_name> and <image_tag> with your desired image name and tag.
 
 ## Tag the Image
 
@@ -69,7 +70,7 @@ Replace <image_name> and <image_tag> with your desired values.
 docker tag <image_name>:<image_tag> <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/<repository_name>:<image_tag>
 ```
 
-Replace <image_name> and <image_tag> with your real values, <your-account-id> with your AWS account ID, <your-region> with your AWS region, <repository_name> with the name of your ECR repository, and <image_tag> with the tag name for your image.
+Ensure you use the same values for <image_name> and <image_tag> as in the previous step.
 
 
 ## Push Image to ECR
@@ -78,7 +79,10 @@ Replace <image_name> and <image_tag> with your real values, <your-account-id> wi
 docker push <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/<repository_name>:<image_tag>
 ```
 
-Replace <your-account-id> with your AWS account ID, <your-region> with your AWS region, <repository_name> with your ECR repository name, and <image_tag> with the tag you specified earlier.
+- Replace `<your-account-id>` with your **AWS account ID**.
+- Replace `<your-region>` with your **AWS region** (e.g., `us-east-1`).
+- Replace `<repository_name>` with your **ECR repository name**.
+- Replace `<image_tag>` with the **tag** you specified earlier.
 
 ## Update deployment.yaml
 
