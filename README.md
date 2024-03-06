@@ -7,7 +7,9 @@ This project demonstrates how to deploy a Flask web application onto an AWS Elas
 - `main.tf`: Defines the Terraform resources for creating the EKS cluster, VPC, subnets, security group, and IAM role.
 - `variables.tf`: Defines the variables used in the Terraform configuration.
 - `providers.tf`: Configures the AWS provider for Terraform.
-- `deployment.yaml` and `service.yaml`: Kubernetes YAML files defining the deployment and service for the Flask application.
+- `outputs.tf`: Provides information about the deployed infrastructure.
+- `deployment.yaml`: Defines how Kubernetes should manage the lifecycle of your application's pods.
+- `service.yaml`: Defines how clients can access the application running in the Kubernetes cluster.
 - `Dockerfile`: Defines the Docker image for the Flask application.
 - `app.py`: Python Flask application code.
 
