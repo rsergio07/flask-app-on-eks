@@ -1,8 +1,8 @@
-# Flask App Deployment on AWS EKS with Terraform
+## Flask App Deployment on AWS EKS with Terraform
 
 This project demonstrates how to deploy a Flask web application onto an AWS Elastic Kubernetes Service (EKS) cluster using Terraform for infrastructure provisioning.
 
-## Files
+# Files
 
 - `main.tf`: Defines the Terraform resources for creating the EKS cluster, VPC, subnets, security group, and IAM role.
 - `variables.tf`: Defines the variables used in the Terraform configuration.
@@ -13,7 +13,7 @@ This project demonstrates how to deploy a Flask web application onto an AWS Elas
 - `Dockerfile`: Defines the Docker image for the Flask application.
 - `app.py`: Python Flask application code.
 
-## Prerequisites
+# Prerequisites
 
 Before you begin, ensure you have the following:
 
@@ -22,11 +22,11 @@ Before you begin, ensure you have the following:
 - Install Terraform `https://developer.hashicorp.com/terraform/install?product_intent=terraform`
 - Install AWS CLI `https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html`
 
-## Getting Started
+# Getting Started
 
 To deploy the Flask application onto an AWS EKS cluster, follow these steps:
 
-# Clone this repository onto your local machine:
+## Clone this repository onto your local machine:
 
 ```bash
 git clone https://github.com/rsergio07/flask-app-on-eks
