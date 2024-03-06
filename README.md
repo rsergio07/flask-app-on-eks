@@ -18,8 +18,9 @@ Before you begin, ensure you have the following:
 - An AWS account with appropriate permissions to create resources.
 - Install Terraform and AWS CLI: Follow the installation instructions for your OS from the official documentation:
 
-- https://developer.hashicorp.com/terraform/install?product_intent=terraform
-- https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+https://developer.hashicorp.com/terraform/install?product_intent=terraform
+
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
 ## Getting Started
 
