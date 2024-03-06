@@ -45,7 +45,7 @@ cd project-lab2
 aws ecr create-repository --repository-name <repository_name>
 ```
 
-Replace <repository_name> with your desired repository name.
+- Replace `<repository_name>` with your desired **ECR repository name**.
 
 ## Login to ECR
 
@@ -53,16 +53,16 @@ Replace <repository_name> with your desired repository name.
 aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.your-region.amazonaws.com
 ```
 
-Replace <your-region> with your AWS region (e.g., us-east-1).
-Replace <your-account-id> with your actual AWS account ID.
-
+- Replace `<your-account-id>` with your **AWS account ID**.
+- Replace `<your-region>` with your **AWS region** (e.g., `us-east-1`).
+  
 # Build Docker Image
 
 ```bash
 docker build -t <image_name>:<image_tag> .
 ```
 
-Replace <image_name> and <image_tag> with your desired image name and tag.
+- Replace `<image_name>` and `<image_tag>` with your desired image name and tag.
 
 ## Tag the Image
 
@@ -70,7 +70,7 @@ Replace <image_name> and <image_tag> with your desired image name and tag.
 docker tag <image_name>:<image_tag> <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/<repository_name>:<image_tag>
 ```
 
-Ensure you use the same values for <image_name> and <image_tag> as in the previous step.
+Ensure you use the same values for `<image_name>` and `<image_tag>` as in the previous step.
 
 
 ## Push Image to ECR
