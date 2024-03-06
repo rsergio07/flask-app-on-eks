@@ -12,6 +12,7 @@ This project demonstrates how to deploy a Flask web application onto an AWS Elas
 - `service.yaml`: Defines how clients can access the application running in the Kubernetes cluster.
 - `Dockerfile`: Defines the Docker image for the Flask application.
 - `app.py`: Python Flask application code.
+- `deploy.yml`: GitHub Actions workflow file responsible for automating the application's deployment process to AWS EKS (Elastic Kubernetes Service).
 
 ## Prerequisites
 
