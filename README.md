@@ -22,7 +22,7 @@ Before you begin, ensure you have the following:
 - Install Terraform `https://developer.hashicorp.com/terraform/install?product_intent=terraform`
 - Install AWS CLI `https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html`
 
-## Getting Started
+# Getting Started
 
 To deploy the Flask application onto an AWS EKS cluster, follow these steps:
 
@@ -54,7 +54,7 @@ aws ecr get-login-password --region your-region | docker login --username AWS --
 
 Replace your-region with the AWS region and your-account-id with your AWS account ID.
 
-## Build Docker Image
+# Build Docker Image
 
 ```bash
 docker build -t <image_name>:<image_tag> .
@@ -82,7 +82,7 @@ Replace <repository_name> with your ECR repository name and <image_tag> with the
 
 After pushing the Docker image to your ECR repository, update the `deployment.yaml` file to replace the image name with the one you pushed to ECR.
 
-## Deploy the Application
+# Deploy the Application
 
 To deploy the application and service on the EKS cluster, use the following commands:
 
@@ -100,7 +100,7 @@ kubectl apply -f service.yaml
 
 This will deploy and expose the application via a service on the EKS cluster.
 
-## Terraform Setup
+# Terraform Setup
 
 Before deploying the infrastructure, please ensure Terraform is installed on your local machine and AWS CLI is configured with appropriate permissions.
 
@@ -134,7 +134,7 @@ terraform apply
 
 ## Wait for Terraform to finish creating the resources. This may take several minutes.
 
-## Access the application
+# Access the application
 
 The output from `terraform apply` should provide the service URL. You can access your application using this URL.
 
