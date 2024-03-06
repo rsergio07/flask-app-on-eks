@@ -18,41 +18,27 @@ This project demonstrates how to deploy a Flask web application onto an AWS Elas
 Before you begin, ensure you have the following:
 
 - An AWS account with appropriate permissions to create resources.
-- Install Terraform and AWS CLI: Follow the installation instructions for your OS from the official documentation:
-
-https://developer.hashicorp.com/terraform/install?product_intent=terraform
-
-https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+- Install kubectl `https://kubernetes.io/docs/tasks/tools/`
+- Install Terraform `https://developer.hashicorp.com/terraform/install?product_intent=terraform`
+- Install AWS CLI `https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html`
 
 ## Getting Started
 
 To deploy the Flask application onto an AWS EKS cluster, follow these steps:
 
-1. Clone this repository onto your local machine:
+# Clone this repository onto your local machine:
 
 ```bash
 git clone https://github.com/rsergio07/flask-app-on-eks
 ```
 
-2. Navigate to the directory containing the application files:
+# Navigate to the directory containing the application files:
 
 ```bash
 cd project-lab2
 ```
 
-## Build and Push Docker Image
-
-To build and push the Docker image to your ECR repository, follow these steps:
-
-1. Build the Docker image:
-
-```bash
-docker build -t <image_name>:<image_tag> .
-```
-
-Replace `<image_name>` and `<image_tag>` with your desired values.
-
-2. Run the following command to create an ECR repository:
+# Create an ECR Repository
 
 ```bash
 aws ecr create-repository --repository-name <repository_name>
@@ -60,13 +46,37 @@ aws ecr create-repository --repository-name <repository_name>
 
 Replace <repository_name> with the desired name for your repository.
 
-3. Push the image to your ECR repository:
+# Login to ECR
 
 ```bash
-docker push <image_repository_uri>/<image_name>:<image_tag>
+aws ecr get-login-password --region your-region | docker login --username AWS --password-stdin your-account-id.dkr.ecr.your-region.amazonaws.com
 ```
 
-Replace `<image_repository_uri>` with your ECR repository URI.
+Replace your-region with the AWS region and your-account-id with your AWS account ID.
+
+# Build Docker Image
+
+```bash
+docker build -t <image_name>:<image_tag> .
+```
+
+Replace <image_name> and <image_tag> with your desired values.
+
+# Tag the Image
+
+```bash
+docker tag <image_name>:<image_tag> your-account-id.dkr.ecr.your-region.amazonaws.com/<repository_name>:<image_tag>
+```
+
+Replace <repository_name> with the name of your ECR repository and <image_tag> with the desired tag for your image.
+
+# Push Image to ECR
+
+```bash
+docker push your-account-id.dkr.ecr.your-region.amazonaws.com/<repository_name>:<image_tag>
+```
+
+Replace <repository_name> with your ECR repository name and <image_tag> with the tag you specified earlier.
 
 ## Update deployment.yaml
 
@@ -76,13 +86,13 @@ After pushing the Docker image to your ECR repository, update the `deployment.ya
 
 To deploy the application and service on the EKS cluster, use the following commands:
 
-1. Apply the deployment configuration:
+# Apply the deployment configuration:
 
 ```bash
 kubectl apply -f deployment.yaml
 ```
 
-2. Apply the service configuration:
+# Apply the service configuration:
 
 ```bash
 kubectl apply -f service.yaml
@@ -98,33 +108,33 @@ Before deploying the infrastructure, please ensure Terraform is installed on you
 
 To deploy the application infrastructure using Terraform, follow these steps:
 
-1. Navigate to the directory containing the Terraform files:
+# Navigate to the directory containing the Terraform files:
 
 ```bash
 cd project-lab2/terraform
 ```
 
-2. Initialize the Terraform environment:
+# Initialize the Terraform environment:
 
 ```bash
 terraform init
 ```
 
-3. Review the changes Terraform will make:
+# Review the changes Terraform will make:
 
 ```bash
 terraform plan
 ```
 
-4. Apply the changes to create the EKS cluster and associated resources:
+# Apply the changes to create the EKS cluster and associated resources:
 
 ```bash
 terraform apply
 ```
 
-5. Wait for Terraform to finish creating the resources. This may take several minutes.
+# Wait for Terraform to finish creating the resources. This may take several minutes.
 
-6. Once the resources are created, you should see an output indicating the name of the EKS cluster and the URL of the deployed Flask app service.
+# Once the resources are created, you should see an output indicating the name of the EKS cluster and the URL of the deployed Flask app service.
 
 ## Clean Up
 
