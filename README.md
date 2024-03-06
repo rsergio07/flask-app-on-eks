@@ -1,4 +1,4 @@
-## Flask App Deployment on AWS EKS with Terraform
+## Flask App Deployment on AWS EKS with Terraform and GitHub Actions
 
 This project demonstrates how to deploy a Flask web application onto an AWS Elastic Kubernetes Service (EKS) cluster using Terraform for infrastructure provisioning.
 
