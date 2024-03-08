@@ -33,30 +33,33 @@ jobs:
           aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value=vpc-for-eks
           echo "::set-output name=vpc-id::$vpc_id"
 
-      - name: Create Subnets in Different AZs
+      - name: Create subnets for EKS
         id: create-subnets
         run: |
-          subnet_01_id=$(aws ec2 create-subnet --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --cidr-block 10.0.1.0/24 --availability-zone us-east-1a --query 'Subnet.{SubnetId:SubnetId}' --output text)
-          subnet_02_id=$(aws ec2 create-subnet --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --cidr-block 10.0.2.0/24 --availability-zone us-east-1b --query 'Subnet.{SubnetId:SubnetId}' --output text)
+          subnet_01_id=$(aws ec2 create-subnet --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --cidr-block 10.0.1.0/24 --query 'Subnet.{SubnetId:SubnetId}' --output text)
+          aws ec2 create-tags --resources $subnet_01_id --tags Key=Name,Value=subnet-01-for-eks
           echo "::set-output name=subnet-01-id::$subnet_01_id"
+
+          subnet_02_id=$(aws ec2 create-subnet --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --cidr-block 10.0.2.0/24 --query 'Subnet.{SubnetId:SubnetId}' --output text)
+          aws ec2 create-tags --resources $subnet_02_id --tags Key=Name,Value=subnet-02-for-eks
           echo "::set-output name=subnet-02-id::$subnet_02_id"
 
-      - name: Create Security Group for EKS
+      - name: Create security group for EKS
         id: create-security-group
         run: |
           security_group_id=$(aws ec2 create-security-group --group-name eks-security-group --description "Security group for EKS" --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --query 'GroupId' --output text)
           aws ec2 create-tags --resources $security_group_id --tags Key=Name,Value=eks-security-group
           echo "::set-output name=security-group-id::$security_group_id"
 
-      - name: Authorize Inbound Traffic for Security Group
-        run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ steps.create-security-group.outputs.security-group-id }} --protocol tcp --port 80 --cidr 0.0.0.0/0
+          existing_rule=$(aws ec2 describe-security-groups --group-ids ${{ steps.create-security-group.outputs.security-group-id }} --query 'SecurityGroups[0].IpPermissionsEgress[?IpProtocol==`-1`].IpRanges[?CidrIp==`0.0.0.0/0`]' --output text)
+          if [ -z "$existing_rule" ]; then
+            echo "Egress rule does not exist, authorizing."
+            aws ec2 authorize-security-group-egress --group-id ${{ steps.create-security-group.outputs.security-group-id }} --protocol -1 --cidr 0.0.0.0/0
+          else
+            echo "Egress rule already exists, skipping authorization."
+          fi
 
-      - name: Authorize Outbound Traffic for Security Group
-        run: |
-          aws ec2 authorize-security-group-egress --group-id ${{ steps.create-security-group.outputs.security-group-id }} --protocol -1 --cidr 0.0.0.0/0
-
-      - name: Create EKS Cluster
+      - name: Create EKS cluster
         run: |
           aws eks create-cluster \
             --name my-eks-cluster \
