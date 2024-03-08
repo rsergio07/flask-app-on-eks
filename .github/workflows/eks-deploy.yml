@@ -15,39 +15,28 @@ jobs:
         with:
           ref: aws-projects
 
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-
-      - name: Configure AWS Credentials
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set region ${{ secrets.AWS_REGION }}
-
       - name: Create IAM role for EKS
-        run: |
-          aws iam create-role \
-            --role-name eks-service-role \
-            --assume-role-policy-document '{
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Principal": {
-                    "Service": "eks.amazonaws.com"
-                  },
-                  "Action": "sts:AssumeRole"
-                }
-              ]
-            }'
-
-      - name: Attach IAM policy to EKS role
-        run: |
-          aws iam attach-role-policy \
-            --role-name eks-service-role \
-            --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+        uses: aws-actions/aws-iam@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: ${{ secrets.AWS_REGION }}  # Define your AWS region
+          create-role: |
+            {
+              "RoleName": "eks-service-role",
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": "eks.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                  }
+                ]
+              }
+            }
 
       - name: Create VPC for EKS
         id: create-vpc
