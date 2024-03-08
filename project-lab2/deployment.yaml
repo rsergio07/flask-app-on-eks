@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: my-rest-api
-        image: 635289283142.dkr.ecr.us-east-1.amazonaws.com/flask-app-on-eks-repo
+        image: <account id>.dkr.ecr.us-east-1.amazonaws.com/flask-app-on-eks-repo
         ports:
         - containerPort: 5000
