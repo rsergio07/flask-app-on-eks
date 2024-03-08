@@ -50,29 +50,41 @@ jobs:
             --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
 
       - name: Create VPC for EKS
+        id: create-vpc
         run: |
-          aws ec2 create-vpc --cidr-block 10.0.0.0/16 --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=vpc-for-eks}]'
+          vpc_id=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 --query 'Vpc.{VpcId:VpcId}' --output text)
+          aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value=vpc-for-eks
+          echo "::set-output name=vpc-id::$vpc_id"
 
       - name: Create subnets for EKS
+        id: create-subnets
         run: |
-          aws ec2 create-subnet --vpc-id <vpc-id> --cidr-block 10.0.1.0/24 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=subnet-01-for-eks}]'
-          aws ec2 create-subnet --vpc-id <vpc-id> --cidr-block 10.0.2.0/24 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=subnet-02-for-eks}]'
+          subnet_01_id=$(aws ec2 create-subnet --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --cidr-block 10.0.1.0/24 --query 'Subnet.{SubnetId:SubnetId}' --output text)
+          aws ec2 create-tags --resources $subnet_01_id --tags Key=Name,Value=subnet-01-for-eks
+          echo "::set-output name=subnet-01-id::$subnet_01_id"
+
+          subnet_02_id=$(aws ec2 create-subnet --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --cidr-block 10.0.2.0/24 --query 'Subnet.{SubnetId:SubnetId}' --output text)
+          aws ec2 create-tags --resources $subnet_02_id --tags Key=Name,Value=subnet-02-for-eks
+          echo "::set-output name=subnet-02-id::$subnet_02_id"
 
       - name: Create security group for EKS
+        id: create-security-group
         run: |
-          aws ec2 create-security-group --group-name sg-for-eks --description "Security group for EKS" --vpc-id <vpc-id>
+          security_group_id=$(aws ec2 create-security-group --group-name sg-for-eks --description "Security group for EKS" --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --query 'GroupId' --output text)
+          aws ec2 create-tags --resources $security_group_id --tags Key=Name,Value=sg-for-eks
+          echo "::set-output name=security-group-id::$security_group_id"
 
       - name: Authorize inbound and outbound traffic for security group
         run: |
-          aws ec2 authorize-security-group-ingress --group-name sg-for-eks --protocol -1 --cidr 0.0.0.0/0
-          aws ec2 authorize-security-group-egress --group-name sg-for-eks --protocol -1 --cidr 0.0.0.0/0
+          aws ec2 authorize-security-group-ingress --group-id ${{ steps.create-security-group.outputs.security-group-id }} --protocol -1 --cidr 0.0.0.0/0
+          aws ec2 authorize-security-group-egress --group-id ${{ steps.create-security-group.outputs.security-group-id }} --protocol -1 --cidr 0.0.0.0/0
 
       - name: Create EKS cluster
         run: |
           aws eks create-cluster \
             --name my-eks-cluster \
             --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/eks-service-role \
-            --resources-vpc-config subnetIds=<subnet-01-id>,<subnet-02-id>,securityGroupIds=<security-group-id>
+            --resources-vpc-config subnetIds=${{ steps.create-subnets.outputs.subnet-01-id }},${{ steps.create-subnets.outputs.subnet-02-id }},securityGroupIds=${{ steps.create-security-group.outputs.security-group-id }}
 
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name my-eks-cluster
