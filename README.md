@@ -50,11 +50,12 @@ aws ecr create-repository --repository-name <repository_name>
 ## Login to ECR
 
 ```bash
-aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.your-region.amazonaws.com
+aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.your-region.amazonaws.com/<repository_name>
 ```
 
 - Replace `<your-region>` with your **AWS region** (e.g., `us-east-1`).
 - Replace `<your-account-id>` with your **AWS account ID**.
+- Replace `<repository_name>` with your **ECR repository name**.
   
 # Build Docker Image
 
