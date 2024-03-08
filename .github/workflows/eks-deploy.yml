@@ -47,8 +47,8 @@ jobs:
       - name: Create security group for EKS
         id: create-security-group
         run: |
-          security_group_id=$(aws ec2 create-security-group --group-name sg-for-eks --description "Security group for EKS" --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --query 'GroupId' --output text)
-          aws ec2 create-tags --resources $security_group_id --tags Key=Name,Value=sg-for-eks
+          security_group_id=$(aws ec2 create-security-group --group-name my-sg-for-eks --description "Security group for EKS" --vpc-id ${{ steps.create-vpc.outputs.vpc-id }} --query 'GroupId' --output text)
+          aws ec2 create-tags --resources $security_group_id --tags Key=Name,Value=my-sg-for-eks
           echo "::set-output name=security-group-id::$security_group_id"
 
       - name: Authorize inbound and outbound traffic for security group
