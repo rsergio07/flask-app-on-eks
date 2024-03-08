@@ -8,12 +8,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
     steps:
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
         with:
-          region: ${{ secrets.AWS_REGION }}        
           mask-password: true
           registry-type: private
           skip-logout: false
@@ -27,13 +28,11 @@ jobs:
       - name: Build and Push Docker Image
         env:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}        
           IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
         run: |
           set -e  # Exit on non-zero exit code from commands below
           docker buildx build --platform linux/amd64,linux/arm64 \
-            -t ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$${{ env.AWS_ACCOUNT_ID }}/{{ env.IMAGE_NAME }}:${{ github.sha }} .
-          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$${{ env.AWS_ACCOUNT_ID }}/{{ env.IMAGE_NAME }}:${{ github.sha }}
+            -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${IMAGE_NAME}:${{ github.sha }} --push .
 
       - name: Deploy to EKS
         run: |
