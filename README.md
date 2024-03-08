@@ -36,7 +36,7 @@ git clone https://github.com/rsergio07/flask-app-on-eks
 ## Navigate to the directory containing the application files:
 
 ```bash
-cd project-lab2
+cd flask-app-on-eks
 ```
 
 ## Create an ECR Repository
