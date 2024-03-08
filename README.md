@@ -2,159 +2,78 @@
 
 This project demonstrates how to deploy a Flask web application onto an AWS Elastic Kubernetes Service (EKS) cluster using Terraform for infrastructure provisioning.
 
-## Files
+## Project Structure
 
-- `main.tf`: Defines the Terraform resources for creating the EKS cluster, VPC, subnets, security group, and IAM role.
-- `variables.tf`: Defines the variables used in the Terraform configuration.
-- `providers.tf`: Configures the AWS provider for Terraform.
-- `outputs.tf`: Provides information about the deployed infrastructure.
-- `deployment.yaml`: Defines how Kubernetes should manage the lifecycle of your application's pods.
-- `service.yaml`: Defines how clients can access the application running in the Kubernetes cluster.
-- `Dockerfile`: Defines the Docker image for the Flask application.
-- `app.py`: Python Flask application code.
-- `deploy.yml`: GitHub Actions workflow file responsible for automating the application's deployment process.
+The project contains the following files and directories:
 
-## Prerequisites
+- `main.tf`: Terraform configuration file for provisioning AWS infrastructure.
+- `variables.tf`: Terraform variables file containing variables used in the main configuration.
+- `output.tf`: Terraform output file containing output variables to display after deployment.
+- `deployment.yaml`: Kubernetes Deployment manifest file for deploying the REST API application.
+- `service.yaml`: The Kubernetes Service manifest file exposes the REST API as a service.
 
-Before you begin, ensure you have the following:
+Additionally, the project contains the following application files:
 
-- An AWS account with appropriate permissions to create resources.
-- Install kubectl `https://kubernetes.io/docs/tasks/tools/`
-- Install Terraform `https://developer.hashicorp.com/terraform/install?product_intent=terraform`
-- Install AWS CLI `https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html`
+- `Dockerfile`: Dockerfile is used to build the Docker image of the REST API.
+- `app.py`: Python script containing the code for the simple REST API application.
 
-# Getting Started
+## Deployment Steps
 
-To deploy the Flask application onto an AWS EKS cluster, follow these steps:
+To deploy the application to Amazon EKS, follow these steps:
 
-## Clone this repository onto your local machine:
+1. **Clone the Repository**: Clone this repository to your local machine.
 
-```bash
-git clone https://github.com/rsergio07/flask-app-on-eks
-```
+2. **Set Up AWS Credentials**: Ensure you have AWS credentials configured with appropriate permissions for provisioning resources. You can set up AWS credentials using the AWS CLI or by configuring environment variables.
 
-## Navigate to the directory containing the application files:
+3. **Run Terraform**: Navigate to the cloned repository directory and run the following commands to deploy the infrastructure using Terraform:
 
-```bash
-cd flask-app-on-eks/project-lab2
-```
+    ```bash
+    terraform init
+    terraform plan
+    terraform apply -auto-approve
+    ```
 
-## Create an ECR Repository
+4. **Build and Push Docker Image**: Build the Docker image of the REST API application and push it to Amazon ECR (Elastic Container Registry) using the following commands:
 
-```bash
-aws ecr create-repository --repository-name <repository_name>
-```
+    ```bash
+    docker build -t my-rest-api .
+    docker tag my-rest-api:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-ecr-repo:latest
+    aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+    docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-ecr-repo:latest
+    ```
 
-- Replace `<repository_name>` with your desired **ECR repository name**.
+    Replace `<aws_account_id>` with your AWS account ID and `<region>` with your AWS region.
 
-## Login to ECR
+5. **Update `kubectl` Configuration**: Update your `kubectl` configuration to connect to the Amazon EKS cluster using the following command:
 
-```bash
-aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.your-region.amazonaws.com/<repository_name>
-```
+    ```bash
+    aws eks --region <region> update-kubeconfig --name <cluster-name>
+    ```
 
-- Replace `<your-region>` with your **AWS region** (e.g., `us-east-1`).
-- Replace `<your-account-id>` with your **AWS account ID**.
-- Replace `<repository_name>` with your **ECR repository name**.
-  
-# Build Docker Image
+    Replace `<region>` with your AWS region and `<cluster-name>` with the name of your Amazon EKS cluster.
 
-```bash
-docker build -t <image_name>:<image_tag> .
-```
+6. **Deploy Kubernetes Resources**: Deploy the Kubernetes resources (Deployment and Service) using the following commands:
 
-- Replace `<image_name>` and `<image_tag>` with your desired image name and tag.
+    ```bash
+    kubectl apply -f deployment.yaml
+    kubectl apply -f service.yaml
+    ```
 
-## Tag the Image
+7. **Verify Deployment**: Verify that the deployment was successful by checking the status of the pods and services using the following commands:
 
-```bash
-docker tag <image_name>:<image_tag> <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/<repository_name>:<image_tag>
-```
+    ```bash
+    kubectl get pods
+    kubectl get svc my-rest-api-service
+    ```
 
-Ensure you use the same values for `<image_name>` and `<image_tag>` as in the previous step.
-
-- Replace `<your-account-id>` with your **AWS account ID**.
-- Replace `<your-region>` with your **AWS region** (e.g., `us-east-1`).
-- Replace `<repository_name>` with your **ECR repository name**.
-- Replace `<image_tag>` with the **tag** you specified earlier.
-
-## Push Image to ECR
-
-```bash
-docker push <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/<repository_name>:<image_tag>
-```
-
-- Replace `<your-account-id>` with your **AWS account ID**.
-- Replace `<your-region>` with your **AWS region** (e.g., `us-east-1`).
-- Replace `<repository_name>` with your **ECR repository name**.
-- Replace `<image_tag>` with the **tag** you specified earlier.
-
-## Update deployment.yaml
-
-After pushing the Docker image to your ECR repository, update the `deployment.yaml` file to replace the image name with the one you pushed to ECR.
-
-# Deploy the Application
-
-To deploy the application and service on the EKS cluster, use the following commands:
-
-## Apply the deployment configuration:
-
-```bash
-kubectl apply -f deployment.yaml
-```
-
-## Apply the service configuration:
-
-```bash
-kubectl apply -f service.yaml
-```
-
-This will deploy and expose the application via a service on the EKS cluster.
-
-# Terraform Setup
-
-Before deploying the infrastructure, please ensure Terraform is installed on your local machine and AWS CLI is configured with appropriate permissions.
-
-## Terraform Deployment Steps
-
-To deploy the application infrastructure using Terraform, follow these steps:
-
-## Navigate to the directory containing the Terraform files:
-
-```bash
-cd flask-app-on-eks/project-lab2/terraform
-```
-
-## Initialize the Terraform environment:
-
-```bash
-terraform init
-```
-
-## Review the changes Terraform will make:
-
-```bash
-terraform plan
-```
-
-## Apply the changes to create the EKS cluster and associated resources:
-
-```bash
-terraform apply
-```
-
-## Wait for Terraform to finish creating the resources. This may take several minutes.
-
-# Access the application
-
-The output from `terraform apply` should provide the service URL. You can access your application using this URL.
+8. **Access the API**: Once the service is successfully deployed and has an external IP address, you can access the API using the provided external IP.
 
 ## Clean Up
 
 To destroy the created resources and avoid incurring charges, run:
 
 ```bash
-terraform destroy
+terraform destroy -auto-approve
 ```
 
 ## Feedback and Contributions
