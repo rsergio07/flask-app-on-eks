@@ -15,27 +15,53 @@ jobs:
         with:
           ref: aws-projects
 
-      - name: Log in to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: true
-          registry-type: private
-          skip-logout: false
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: Create IAM role for EKS
+        run: |
+          aws iam create-role --role-name eks-service-role --assume-role-policy-document '{
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "eks.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+              }
+            ]
+          }'
+
+      - name: Attach IAM policy to EKS role
+        run: |
+          aws iam attach-role-policy --role-name eks-service-role --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+
+      - name: Create VPC for EKS
+        run: |
+          aws ec2 create-vpc --cidr-block 10.0.0.0/16 --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=vpc-for-eks}]'
+
+      - name: Create subnets for EKS
+        run: |
+          aws ec2 create-subnet --vpc-id <vpc-id> --cidr-block 10.0.1.0/24 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=subnet-01-for-eks}]'
+          aws ec2 create-subnet --vpc-id <vpc-id> --cidr-block 10.0.2.0/24 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=subnet-02-for-eks}]'
+
+      - name: Create security group for EKS
+        run: |
+          aws ec2 create-security-group --group-name sg-for-eks --description "Security group for EKS" --vpc-id <vpc-id>
+
+      - name: Authorize inbound and outbound traffic for security group
+        run: |
+          aws ec2 authorize-security-group-ingress --group-name sg-for-eks --protocol -1 --cidr 0.0.0.0/0
+          aws ec2 authorize-security-group-egress --group-name sg-for-eks --protocol -1 --cidr 0.0.0.0/0
 
       - name: Create EKS cluster
         run: |
           aws eks create-cluster \
             --name my-eks-cluster \
             --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/eks-service-role \
-            --resources-vpc-config subnetIds=subnet-01-for-eks,subnet-02-for-eks,securityGroupIds=sg-for-eks
+            --resources-vpc-config subnetIds=<subnet-01-id>,<subnet-02-id>,securityGroupIds=<security-group-id>
   
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name my-eks-cluster
-  
+
       - name: Build Docker image
         run: docker build -t my-ecr-repo/my-rest-api:latest .
   
