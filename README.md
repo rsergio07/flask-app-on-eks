@@ -36,7 +36,7 @@ git clone https://github.com/rsergio07/flask-app-on-eks
 ## Navigate to the directory containing the application files:
 
 ```bash
-cd flask-app-on-eks
+cd flask-app-on-eks/project-lab2
 ```
 
 ## Create an ECR Repository
@@ -122,7 +122,7 @@ To deploy the application infrastructure using Terraform, follow these steps:
 ## Navigate to the directory containing the Terraform files:
 
 ```bash
-cd project-lab2/terraform
+cd flask-app-on-eks/project-lab2/terraform
 ```
 
 ## Initialize the Terraform environment:
