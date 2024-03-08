@@ -15,28 +15,40 @@ jobs:
         with:
           ref: aws-projects
 
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Configure AWS Credentials
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set region ${{ secrets.AWS_REGION }}
+
       - name: Create IAM role for EKS
-        uses: aws-actions/aws-iam@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          region: ${{ secrets.AWS_REGION }}  # Define your AWS region
-          create-role: |
-            {
-              "RoleName": "eks-service-role",
-              "AssumeRolePolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Principal": {
-                      "Service": "eks.amazonaws.com"
-                    },
-                    "Action": "sts:AssumeRole"
-                  }
-                ]
-              }
-            }
+        run: |
+          aws iam create-role \
+            --role-name eks-service-role \
+            --assume-role-policy-document '{
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": "eks.amazonaws.com"
+                  },
+                  "Action": "sts:AssumeRole"
+                }
+              ]
+            }'
+
+      - name: Attach IAM policy to EKS role
+        run: |
+          aws iam attach-role-policy \
+            --role-name eks-service-role \
+            --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+
       - name: Create VPC for EKS
         run: |
           aws ec2 create-vpc --cidr-block 10.0.0.0/16 --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=vpc-for-eks}]'
@@ -61,19 +73,19 @@ jobs:
             --name my-eks-cluster \
             --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/eks-service-role \
             --resources-vpc-config subnetIds=<subnet-01-id>,<subnet-02-id>,securityGroupIds=<security-group-id>
-  
+
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name my-eks-cluster
 
       - name: Build Docker image
         run: docker build -t my-ecr-repo/my-rest-api:latest .
-  
+
       - name: Authenticate Docker to ECR
         run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-  
+
       - name: Push Docker image to ECR
         run: docker push my-ecr-repo/my-rest-api:latest
-  
+
       - name: Deploy REST API app to EKS
         run: |
           set -e
