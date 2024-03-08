@@ -10,49 +10,49 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-      with:
-        ref: aws-projects
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          ref: aws-projects
 
-    - name: Install AWS CLI
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y awscli
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
 
-    - name: Configure AWS Credentials
-      run: |
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws configure set region ${{ secrets.AWS_REGION }}
+      - name: Configure AWS Credentials
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set region ${{ secrets.AWS_REGION }}
 
-    - name: Create or Get IAM role for EKS (using check)
-      id: eks-service-role
-      run: |
-        role_arn=$(aws iam get-role --role-name eks-service-role --query 'Role.Arn' --output text 2>/dev/null || echo "")
-        if [ -z "$role_arn" ]; then
-          aws iam create-role \
-            --role-name eks-service-role \
-            --assume-role-policy-document '{
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Principal": {
-                    "Service": "eks.amazonaws.com"
-                  },
-                  "Action": "sts:AssumeRole"
-                }
-              ]
-            }'
-        fi
-        echo "::set-output name=role_arn::$role_arn"
+      - name: Create or Get IAM role for EKS (using check)
+        id: eks-service-role
+        run: |
+          role_arn=$(aws iam get-role --role-name eks-service-role --query 'Role.Arn' --output text 2>/dev/null || echo "")
+          if [ -z "$role_arn" ]; then
+            aws iam create-role \
+              --role-name eks-service-role \
+              --assume-role-policy-document '{
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": "eks.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                  }
+                ]
+              }'
+          fi
+          echo "::set-output name=role_arn::$role_arn"
 
-    - name: Attach IAM policy to EKS role
-      run: |
-        aws iam attach-role-policy \
-          --role-name ${{ steps.eks-service-role.outputs.role_arn }} \
-          --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+      - name: Attach IAM policy to EKS role
+        run: |
+          aws iam attach-role-policy \
+            --role-name ${{ steps.eks-service-role.outputs.role_arn }} \
+            --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
 
       - name: Create VPC for EKS
         id: create-vpc
