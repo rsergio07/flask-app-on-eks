@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:      
+    steps:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
         with:
@@ -31,13 +31,14 @@ jobs:
         env:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          set -e  # Exit on non-zero exit code from commands below
+          set -e
           docker buildx build --platform linux/amd64,linux/arm64 \
             -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${IMAGE_NAME}:${{ github.sha }} --push .
 
       - name: Deploy to EKS
         run: |
-          set -e  # Exit on non-zero exit code from commands below
+          set -e
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
