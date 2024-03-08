@@ -36,7 +36,7 @@ jobs:
           set -e
           docker buildx build --platform linux/amd64,linux/arm64 \
             -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${IMAGE_NAME}:${{ github.sha }} \
-            -f flask-app-on-eks/aws-projects/project-lab2/Dockerfile . --push
+            -f aws-projects/project-lab2/Dockerfile . --push
 
       - name: Deploy to EKS
         run: |
