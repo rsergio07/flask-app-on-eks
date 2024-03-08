@@ -10,6 +10,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          ref: aws-projects
+
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
         with:
@@ -21,27 +26,27 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
 
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-        with:
-          ref: aws-projects
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Build and Push Docker Image
-        env:
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: Create EKS cluster
+        run: |
+          aws eks create-cluster \
+            --name my-eks-cluster \
+            --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/eks-service-role \
+            --resources-vpc-config subnetIds=subnet-01-for-eks,subnet-02-for-eks,securityGroupIds=sg-for-eks
+  
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name my-eks-cluster
+  
+      - name: Build Docker image
+        run: docker build -t my-ecr-repo/my-rest-api:latest .
+  
+      - name: Authenticate Docker to ECR
+        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  
+      - name: Push Docker image to ECR
+        run: docker push my-ecr-repo/my-rest-api:latest
+  
+      - name: Deploy REST API app to EKS
         run: |
           set -e
-          docker buildx build --platform linux/amd64,linux/arm64 \
-            -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${IMAGE_NAME}:${{ github.sha }} \
-            -f Dockerfile . --push
-
-      - name: Deploy to EKS
-        run: |
-          set -e
-          kubectl apply -f deployment.yaml
+          kubectl apply -f deployment.yml
           kubectl apply -f service.yaml
