@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: my-rest-api-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: my-rest-api
@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: my-rest-api
-        image: <account id>.dkr.ecr.us-east-1.amazonaws.com/flask-app-on-eks-repo
+        image: 635289283142.dkr.ecr.us-east-1.amazonaws.com/my-ecr-repo:latest
         ports:
         - containerPort: 5000
