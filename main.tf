@@ -11,12 +11,15 @@ resource "aws_vpc" "eks_vpc" {
   }
 }
 
+# Data source to get availability zones
+data "aws_availability_zones" "available" {}
+
 # Create Subnets
 resource "aws_subnet" "eks_subnets" {
-  count                  = length(var.subnet_names)
-  vpc_id                 = aws_vpc.eks_vpc.id
-  cidr_block             = cidrsubnet(aws_vpc.eks_vpc.cidr_block, 8, count.index)
-  availability_zone      = element(data.aws_availability_zones.available.names, count.index)
+  count                   = length(var.subnet_names)
+  vpc_id                  = aws_vpc.eks_vpc.id
+  cidr_block              = cidrsubnet(aws_vpc.eks_vpc.cidr_block, 8, count.index)
+  availability_zone       = element(data.aws_availability_zones.available.names, count.index)
   map_public_ip_on_launch = true
   tags = {
     Name = var.subnet_names[count.index]
@@ -43,29 +46,29 @@ resource "aws_security_group" "eks_sg" {
   }
 }
 
-# Create IAM role for EKS cluster
+# Create IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_cluster_role" {
-  name               = "eks-cluster-role"
+  name = "eks-cluster-role"
   assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [{
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "eks.amazonaws.com"
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Effect" : "Allow",
+      "Principal" : {
+        "Service" : "eks.amazonaws.com"
       },
-      "Action": "sts:AssumeRole"
+      "Action" : "sts:AssumeRole"
     }]
   })
 }
 
-# Attach policy to IAM role allowing EKS cluster to manage worker nodes
+# Attach Policy to IAM Role, allowing Kubernetes the permissions required to manage resources
 resource "aws_iam_policy_attachment" "eks_cluster_policy_attachment" {
   name       = "eks-cluster-policy-attachment"
   roles      = [aws_iam_role.eks_cluster_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
-# Attach policy to IAM role allowing EKS to manage resources on your behalf
+# Attach Policy to IAM Role, allowing ECS to create and manage the necessary resources to operate EKS Clusters
 resource "aws_iam_policy_attachment" "eks_service_policy_attachment" {
   name       = "eks-service-policy-attachment"
   roles      = [aws_iam_role.eks_cluster_role.name]
@@ -73,7 +76,7 @@ resource "aws_iam_policy_attachment" "eks_service_policy_attachment" {
 }
 
 # Create EKS Cluster
-resource "aws_eks_cluster" "cluster" {
+resource "aws_eks_cluster" "my_cluster" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
 
@@ -85,13 +88,5 @@ resource "aws_eks_cluster" "cluster" {
 
 # Create ECR Repository
 resource "aws_ecr_repository" "my_ecr_repo" {
-  name = "my-ecr-repo"
-}
-
-# Data source to get availability zones
-data "aws_availability_zones" "available" {}
-
-# Data source to retrieve EKS cluster authentication details
-data "aws_eks_cluster_auth" "cluster" {
-  name = aws_eks_cluster.cluster.name
+  name = var.ecr_repository_name
 }
