@@ -39,6 +39,7 @@ To deploy the application to Amazon EKS, follow these steps:
 3. **Build and Push Docker Image**: Build the Docker image of the REST API application and push it to Amazon ECR (Elastic Container Registry) using the following commands:
 
     ```bash
+    podman machine init; podman machine start
     podman build -t my-flask-app .
     podman tag my-flask-app:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-flask-app:latest
     aws ecr get-login-password --region <region> | docker login --username aws --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
