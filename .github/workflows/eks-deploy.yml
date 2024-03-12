@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - aws-projects
+      
+  workflow_dispatch:
+      
 
 jobs:
   deploy:
