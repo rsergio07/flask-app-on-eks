@@ -28,18 +28,18 @@ To deploy the application to Amazon EKS, follow these steps:
 3. **Run Terraform**: Navigate to the cloned repository directory and run the following commands to deploy the infrastructure using Terraform:
 
     ```bash
-    terraform init
+    terraform init 
     terraform plan
-    terraform apply -auto-approve
+    terraform apply
     ```
 
 4. **Build and Push Docker Image**: Build the Docker image of the REST API application and push it to Amazon ECR (Elastic Container Registry) using the following commands:
 
     ```bash
-    docker build -t my-rest-api .
-    docker tag my-rest-api:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-ecr-repo:latest
-    aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
-    docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-ecr-repo:latest
+    podman build -t my-flask-app .
+    podman tag my-flask-app:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-flask-app:latest
+    aws ecr get-login-password --region <region> | docker login --username aws --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+    podman push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-flask-app:latest
     ```
 
     Replace `<aws_account_id>` with your AWS account ID and `<region>` with your AWS region.
