@@ -28,7 +28,7 @@ jobs:
           args: init -backend-config=
         
       - name: Terraform Init
-        run: terraform init -no-shared-config
+        run: terraform init
       
       - name: Terraform Plan
         run: terraform plan
