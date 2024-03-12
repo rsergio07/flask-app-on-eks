@@ -9,7 +9,6 @@ The project contains the following files and directories:
 - `main.tf`: Terraform configuration file for provisioning AWS infrastructure.
 - `variables.tf`: Terraform variables file containing variables used in the main configuration.
 - `output.tf`: Terraform output file containing output variables to display after deployment.
-- `backend.tf`: Terraform configuration file for storing the Terraform state file in an S3 bucket.
 - `deployment.yaml`: Kubernetes Deployment manifest file for deploying the REST API application.
 - `service.yaml`: The Kubernetes Service manifest file exposes the REST API as a service.
 
