@@ -7,7 +7,7 @@ You'll need an AWS account with permissions to create and manage resources like 
 # Infrastructure Tools
 
 -  Terraform: This tool helps manage and provision infrastructure as code. Download and install Terraform based on your operating system from the official website: https://developer.hashicorp.com/terraform/install
--  AWS CLI: Interact with AWS services from your command line. Install the AWS CLI using pip (Python package manager) or download the package from the AWS website: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+-  AWS CLI: Interact with AWS services from your command line. Install the AWS CLI using a package manager or download the package from the AWS website: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
 # Containerization Tools
 
