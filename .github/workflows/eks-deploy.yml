@@ -24,6 +24,8 @@ jobs:
       
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          args: init -backend-config=
         
       - name: Terraform Init
         run: terraform init -no-shared-config
