@@ -24,6 +24,9 @@ jobs:
       
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Format
+        run: terraform fmt
         
       - name: Terraform Init
         run: terraform init -backend-config=S3-backend.tf -reconfigure
