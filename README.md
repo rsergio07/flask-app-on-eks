@@ -18,6 +18,10 @@ Additionally, the project contains the following application files:
 - `Dockerfile`: Dockerfile is used to build the Docker image of the REST API.
 - `app.py`: Python script containing the code for the simple REST API application.
 
+## Prerequisites
+
+"Please review the prerequisites page."
+
 ## Deployment Steps
 
 To deploy the application to Amazon EKS, follow these steps:
