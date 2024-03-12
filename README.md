@@ -28,9 +28,7 @@ To deploy the application to Amazon EKS, follow these steps:
 
 1. **Clone the Repository**: Clone this repository to your local machine.
 
-2. **Set Up AWS Credentials**: Ensure you have AWS credentials configured with appropriate permissions for provisioning resources. You can set up AWS credentials using the AWS CLI or by configuring environment variables.
-
-3. **Run Terraform**: Navigate to the cloned repository directory and run the following commands to deploy the infrastructure using Terraform:
+2. **Run Terraform**: Navigate to the cloned repository directory and run the following commands to deploy the infrastructure using Terraform:
 
     ```bash
     terraform init 
@@ -38,7 +36,7 @@ To deploy the application to Amazon EKS, follow these steps:
     terraform apply
     ```
 
-4. **Build and Push Docker Image**: Build the Docker image of the REST API application and push it to Amazon ECR (Elastic Container Registry) using the following commands:
+3. **Build and Push Docker Image**: Build the Docker image of the REST API application and push it to Amazon ECR (Elastic Container Registry) using the following commands:
 
     ```bash
     podman build -t my-flask-app .
@@ -49,7 +47,7 @@ To deploy the application to Amazon EKS, follow these steps:
 
     Replace `<aws_account_id>` with your AWS account ID and `<region>` with your AWS region.
 
-5. **Update `kubectl` Configuration**: Update your `kubectl` configuration to connect to the Amazon EKS cluster using the following command:
+4. **Update `kubectl` Configuration**: Update your `kubectl` configuration to connect to the Amazon EKS cluster using the following command:
 
     ```bash
     aws eks --region <region> update-kubeconfig --name <cluster-name>
@@ -57,21 +55,21 @@ To deploy the application to Amazon EKS, follow these steps:
 
     Replace `<region>` with your AWS region and `<cluster-name>` with the name of your Amazon EKS cluster.
 
-6. **Deploy Kubernetes Resources**: Deploy the Kubernetes resources (Deployment and Service) using the following commands:
+5. **Deploy Kubernetes Resources**: Deploy the Kubernetes resources (Deployment and Service) using the following commands:
 
     ```bash
     kubectl apply -f deployment.yaml
     kubectl apply -f service.yaml
     ```
 
-7. **Verify Deployment**: Verify that the deployment was successful by checking the status of the pods and services using the following commands:
+6. **Verify Deployment**: Verify that the deployment was successful by checking the status of the pods and services using the following commands:
 
     ```bash
     kubectl get pods
     kubectl get svc my-rest-api-service
     ```
 
-8. **Access the API**: Once the service is successfully deployed and has an external IP address, you can access the API using the provided external IP.
+7. **Access the API**: Once the service is successfully deployed and has an external IP address, you can access the API using the provided external IP.
 
 ## Clean Up
 
