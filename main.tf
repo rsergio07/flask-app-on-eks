@@ -3,6 +3,15 @@ provider "aws" {
   region = var.region
 }
 
+# Specifies the backend configuration for storing the Terraform state file in an S3 bucket
+terraform {
+  backend "s3" {
+    bucket = "rsergio-terraform-statefile-bucket"
+    key    = "terraform.tfstate"
+    region = var.region
+  }
+}
+
 # Create VPC
 resource "aws_vpc" "eks_vpc" {
   cidr_block = "10.0.0.0/16"
