@@ -40,22 +40,43 @@ resource "aws_security_group" "eks_sg" {
   name   = var.security_group_name
   vpc_id = aws_vpc.eks_vpc.id
 
-  egress {
+  ingress {
     from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    to_port     = 65535
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
+  egress {
     from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    to_port     = 65535
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-# Create IAM Role for EKS Cluster
+# Create Route Table
+resource "aws_route_table" "subnet_route_table" {
+  count = length(aws_subnet.eks_subnets)
+
+  vpc_id = aws_vpc.eks_vpc.id
+}
+
+# Create Route for Internet Gateway
+resource "aws_route" "subnet_route_to_internet_gateway" {
+  count                = length(aws_subnet.eks_subnets)
+  route_table_id       = aws_route_table.subnet_route_table[count.index].id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id           = var.internet_gateway_id
+}
+
+# Associate Subnets with Route Tables
+resource "aws_route_table_association" "subnet_association" {
+  count       = length(aws_subnet.eks_subnets)
+  subnet_id   = aws_subnet.eks_subnets[count.index].id
+  route_table_id = aws_route_table.subnet_route_table[count.index].id
+}
+
 # Create IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_cluster_role" {
   name = "eks-cluster-role"
@@ -117,6 +138,5 @@ resource "aws_eks_node_group" "my_cluster_nodes" {
     min_size     = 1
   }
 
-  # Additional configurations as needed
-  instance_types = ["t2.micro"]
+  instance_types = ["t3.micro"]
 }
