@@ -179,8 +179,3 @@ resource "aws_eks_node_group" "my_cluster_nodes" {
 
   instance_types = ["t3.micro"]
 }
-
-# Outputs
-output "internet_gateway_id" {
-  value = aws_internet_gateway.my_igw.id
-}
