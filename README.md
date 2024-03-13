@@ -93,11 +93,7 @@ Once the service is successfully deployed and has an external IP address, you ca
 
 ## Clean Up
 
-To destroy the created resources and avoid incurring charges, run:
-
-```bash
-terraform destroy -auto-approve
-```
+To remove the previously created resources, you need to trigger the destroy workflow. This can be done by pushing the changes you have made to your branch. Once the changes are pushed, the destroy workflow will be initiated, and it will remove the relevant resources. It's important to remember that this process is irreversible, so make sure that you want to completely remove the resources before triggering the destroy workflow.
 
 ## Feedback and Contributions
 
