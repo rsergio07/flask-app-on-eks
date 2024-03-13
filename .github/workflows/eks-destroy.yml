@@ -8,15 +8,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Delete EKS Node Group
-        run: |
-          aws eks delete-nodegroup --cluster-name my-eks-cluster --nodegroup-name my-cluster-nodes
-
-      - name: Empty ECR Repository
-        run: |
-          aws ecr describe-images --repository-name my-ecr-repo
-          aws ecr describe-images --repository-name my-ecr-repo --query 'imageIds[*].[imageTag]' --output text | xargs -n 1 -I {} aws ecr batch-delete-image --repository-name my-ecr-repo --image-ids imageTag={}
-
       - name: Destroy Terraform Resources
         run: |
           terraform destroy -auto-approve
