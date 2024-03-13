@@ -69,16 +69,16 @@ resource "aws_route_table" "subnet_route_table" {
 
 # Create a set of route resources to route all traffic from each subnet in the Amazon EKS VPC to the Internet Gateway
 resource "aws_route" "subnet_route_to_internet_gateway" {
-  count                   = length(aws_subnet.eks_subnets)
-  route_table_id          = aws_route_table.subnet_route_table[count.index].id
-  destination_cidr_block  = "0.0.0.0/0"
-  gateway_id              = aws_internet_gateway.my_igw.id
+  count                  = length(aws_subnet.eks_subnets)
+  route_table_id         = aws_route_table.subnet_route_table[count.index].id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.my_igw.id
 }
 
 # Associate Subnets with Route Tables
 resource "aws_route_table_association" "subnet_association" {
-  count       = length(aws_subnet.eks_subnets)
-  subnet_id   = aws_subnet.eks_subnets[count.index].id
+  count          = length(aws_subnet.eks_subnets)
+  subnet_id      = aws_subnet.eks_subnets[count.index].id
   route_table_id = aws_route_table.subnet_route_table[count.index].id
 }
 
@@ -144,4 +144,9 @@ resource "aws_eks_node_group" "my_cluster_nodes" {
   }
 
   instance_types = ["t3.micro"]
+}
+
+# Outputs
+output "internet_gateway_id" {
+  value = aws_internet_gateway.my_igw.id
 }
