@@ -72,9 +72,9 @@ Ensure the following secrets are configured in your GitHub repository:
 
 Update your `kubectl` configuration to connect to the Amazon EKS cluster using the following command:
 
-    ```bash
-    aws eks --region <region> update-kubeconfig --name <cluster-name>
-    ```
+```bash
+aws eks --region <region> update-kubeconfig --name <cluster-name>
+```
 
 Replace `<region>` with your AWS region and `<cluster-name>` with the name of your Amazon EKS cluster.
 
@@ -82,10 +82,10 @@ Replace `<region>` with your AWS region and `<cluster-name>` with the name of yo
 
 Verify that the deployment was successful by checking the status of the pods and services using the following commands:
 
-    ```bash
-    kubectl get pods
-    kubectl get svc my-rest-api-service
-    ```
+```bash
+kubectl get pods
+kubectl get svc my-rest-api-service
+```
 
 ## Access the API
 
