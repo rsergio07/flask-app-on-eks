@@ -1,3 +1,5 @@
+# variables.tf
+
 # Specifies the AWS region where resources will be provisioned
 variable "region" {
   default = "us-east-1"
@@ -16,11 +18,6 @@ variable "subnet_names" {
 # Specifies the name of the security group for the Amazon EKS cluster
 variable "security_group_name" {
   default = "eks-security-group"
-}
-
-# ID of the Internet Gateway to be associated with route tables
-variable "internet_gateway_id" {
-  description = "The ID of the Internet Gateway to be associated with route tables"
 }
 
 # Specifies the name of the Amazon EKS cluster
