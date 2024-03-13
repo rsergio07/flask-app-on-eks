@@ -39,6 +39,9 @@ jobs:
         run: terraform apply -auto-approve
         if: ${{ success() }}
       
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name my-eks-cluster
+
       - name: Build Docker image
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
@@ -48,3 +51,8 @@ jobs:
       - name: Push Docker image to Amazon ECR
         run: |
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-ecr-repo:latest
+      
+      - name: Deploy REST API app to EKS
+        run: |
+          kubectl apply -f deployment.yml
+          kubectl apply -f service.yaml
