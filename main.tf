@@ -60,14 +60,14 @@ resource "aws_security_group" "eks_sg" {
   }
 }
 
-# Create a set of route resources to route traffic for each subnet in the Amazon EKS VPC
+# Create Route traffic for each subnet in the Amazon EKS VPC
 resource "aws_route_table" "subnet_route_table" {
   count = length(aws_subnet.eks_subnets)
 
   vpc_id = aws_vpc.eks_vpc.id
 }
 
-# Create a set of route resources to route all traffic from each subnet in the Amazon EKS VPC to the Internet Gateway
+# Create Route traffic from each subnet to the Internet Gateway
 resource "aws_route" "subnet_route_to_internet_gateway" {
   count                  = length(aws_subnet.eks_subnets)
   route_table_id         = aws_route_table.subnet_route_table[count.index].id
@@ -91,7 +91,7 @@ resource "aws_iam_role" "eks_cluster_role" {
     "Statement" : [{
       "Effect" : "Allow",
       "Principal" : {
-        "Service" : ["eks.amazonaws.com", "ec2.amazonaws.com"]
+        "Service" : ["eks.amazonaws.com"]
       },
       "Action" : "sts:AssumeRole"
     }]
@@ -130,11 +130,45 @@ resource "aws_ecr_repository" "my_ecr_repo" {
   name = var.ecr_repository_name
 }
 
+# Create IAM Role for the Nodes
+resource "aws_iam_role" "nodes" {
+  name = "eks-node-group-nodes"
+
+  assume_role_policy = jsonencode({
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+    }]
+    Version = "2012-10-17"
+  })
+}
+
+# Attach Policies to the IAM Role
+resource "aws_iam_role_policy_attachment" "nodes-AmazonEKSWorkerNodePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.nodes.name
+}
+
+# Attach Policies to the IAM Role
+resource "aws_iam_role_policy_attachment" "nodes-AmazonEKS_CNI_Policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.nodes.name
+}
+
+# Attach Policies to the IAM Role
+resource "aws_iam_role_policy_attachment" "nodes-AmazonEC2ContainerRegistryReadOnly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.nodes.name
+}
+
 # Create EKS Node Group
 resource "aws_eks_node_group" "my_cluster_nodes" {
   cluster_name    = aws_eks_cluster.my_cluster.name
   node_group_name = "my-cluster-nodes"
-  node_role_arn   = aws_iam_role.eks_cluster_role.arn
+  node_role_arn   = aws_iam_role.nodes.arn
   subnet_ids      = aws_subnet.eks_subnets[*].id
 
   scaling_config {
