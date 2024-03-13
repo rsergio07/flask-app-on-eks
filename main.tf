@@ -20,6 +20,11 @@ resource "aws_vpc" "eks_vpc" {
   }
 }
 
+# Create an Internet Gateway
+resource "aws_internet_gateway" "my_igw" {
+  vpc_id = aws_vpc.eks_vpc.id
+}
+
 # Data source to get availability zones
 data "aws_availability_zones" "available" {}
 
@@ -55,19 +60,18 @@ resource "aws_security_group" "eks_sg" {
   }
 }
 
-# Create Route Table
+# Create Route Table to route internet-bound traffic through the Internet Gateway
 resource "aws_route_table" "subnet_route_table" {
   count = length(aws_subnet.eks_subnets)
 
   vpc_id = aws_vpc.eks_vpc.id
 }
 
-# Create Route for Internet Gateway
 resource "aws_route" "subnet_route_to_internet_gateway" {
-  count                = length(aws_subnet.eks_subnets)
-  route_table_id       = aws_route_table.subnet_route_table[count.index].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id           = var.internet_gateway_id
+  count                   = length(aws_subnet.eks_subnets)
+  route_table_id          = aws_route_table.subnet_route_table[count.index].id
+  destination_cidr_block  = "0.0.0.0/0"
+  gateway_id              = aws_internet_gateway.my_igw.id
 }
 
 # Associate Subnets with Route Tables
