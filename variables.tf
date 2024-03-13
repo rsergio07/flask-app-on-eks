@@ -18,6 +18,11 @@ variable "security_group_name" {
   default = "eks-security-group"
 }
 
+# ID of the Internet Gateway to be associated with route tables
+variable "internet_gateway_id" {
+  description = "The ID of the Internet Gateway to be associated with route tables"
+}
+
 # Specifies the name of the Amazon EKS cluster
 variable "cluster_name" {
   description = "The name of the EKS cluster"
