@@ -4,72 +4,92 @@ This project demonstrates how to deploy a Flask web application onto an AWS Elas
 
 ## Project Structure
 
-The project contains the following files and directories:
+The project contains the following files:
 
 - `main.tf`: Terraform configuration file for provisioning AWS infrastructure.
 - `variables.tf`: Terraform variables file containing variables used in the main configuration.
 - `output.tf`: Terraform output file containing output variables to display after deployment.
 - `deployment.yaml`: Kubernetes Deployment manifest file for deploying the REST API application.
 - `service.yaml`: The Kubernetes Service manifest file exposes the REST API as a service.
+- `eks-deploy.yml`: Kubernetes manifest file for deploying the REST API application using GitHub Actions.
 
 Additionally, the project contains the following application files:
 
 - `Dockerfile`: Dockerfile is used to build the Docker image of the REST API.
 - `app.py`: Python script containing the code for the simple REST API application.
 
+## Terraform Configuration (`main.tf`)
+
+This file defines the infrastructure components required for AWS EKS deployment, including VPC, subnets, security groups, IAM roles, EKS cluster, ECR repository, and EKS node group.
+
+## Terraform Variables (`variables.tf`)
+
+This file defines Terraform variables used to customize the AWS infrastructure, such as region, VPC name, subnet names, security group name, cluster name, ECR repository name, and service port.
+
+## Terraform Outputs (`outputs.tf`)
+
+This file defines Terraform output variables to display after deployment. This project defines the URL of the deployed Flask app.
+
+## Deployment Workflow (`eks-deploy.yml`)
+
+This GitHub Actions workflow file automates the deployment process. It checks out the code, sets up AWS CLI, installs Terraform, initializes Terraform, validates Terraform configuration, applies Terraform changes, updates kubeconfig, builds the Docker image, pushes the Docker image to Amazon ECR, and deploys the REST API app to EKS.
+
+## Docker Configuration (`Dockerfile`)
+
+The Dockerfile specifies the Docker image configuration for the REST API application. It installs Python dependencies and exposes port 5000 for the Flask application.
+
+## REST API Application (`app.py`)
+
+This Python script contains the code for a simple REST API application built with Flask. It defines endpoints for retrieving store information.
+
+## Kubernetes Manifests (`deployment.yaml` and `service.yaml`)
+
+These YAML files define the Kubernetes Deployment and Service manifests for deploying the REST API application on EKS. The Deployment specifies the container image, ports, and replicas, while the Service exposes the application as a load-balanced service.
+
 ## Prerequisites
 
 "Please review the prerequisites page."
 
+## GitHub Actions Secrets
+
+Ensure the following secrets are configured in your GitHub repository:
+
+- `AWS_ACCESS_KEY_ID`: AWS access key ID with permissions to provision resources.
+- `AWS_SECRET_ACCESS_KEY`: AWS secret access key corresponding to the access key ID.
+- `AWS_REGION`: AWS region where resources will be provisioned.
+- `AWS_ACCOUNT_ID`: AWS account ID is used to push the Docker image to ECR.
+
 ## Deployment Steps
 
-To deploy the application to Amazon EKS, follow these steps:
+1. Clone this repository.
+2. Configure the GitHub Actions secrets.
+3. Update the Terraform variables in `variables.tf` as needed.
+4. Push changes to your branch to trigger the deployment workflow.
+5. Monitor the GitHub Actions workflow for any errors or failures.
+6. Once the deployment workflow is successful, move to the next steps
 
-1. **Clone the Repository**: Clone this repository to your local machine.
+## Update `kubectl` Configuration
 
-2. **Run Terraform**: Navigate to the cloned repository directory and run the following commands to deploy the infrastructure using Terraform:
-
-    ```bash
-    terraform init 
-    terraform plan
-    terraform apply
-    ```
-
-3. **Build and Push Docker Image**: Build the Docker image of the REST API application and push it to Amazon ECR (Elastic Container Registry) using the following commands:
-
-    ```bash
-    podman machine init; podman machine start
-    podman build -t my-flask-app .
-    podman tag my-flask-app:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-flask-app:latest
-    aws ecr get-login-password --region <region> | docker login --username aws --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
-    podman push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-flask-app:latest
-    ```
-
-    Replace `<aws_account_id>` with your AWS account ID and `<region>` with your AWS region.
-
-4. **Update `kubectl` Configuration**: Update your `kubectl` configuration to connect to the Amazon EKS cluster using the following command:
+Update your `kubectl` configuration to connect to the Amazon EKS cluster using the following command:
 
     ```bash
     aws eks --region <region> update-kubeconfig --name <cluster-name>
     ```
 
-    Replace `<region>` with your AWS region and `<cluster-name>` with the name of your Amazon EKS cluster.
+Replace `<region>` with your AWS region and `<cluster-name>` with the name of your Amazon EKS cluster.
 
-5. **Deploy Kubernetes Resources**: Deploy the Kubernetes resources (Deployment and Service) using the following commands:
+## Verify Deployment
 
-    ```bash
-    kubectl apply -f deployment.yaml
-    kubectl apply -f service.yaml
-    ```
-
-6. **Verify Deployment**: Verify that the deployment was successful by checking the status of the pods and services using the following commands:
+Verify that the deployment was successful by checking the status of the pods and services using the following commands:
 
     ```bash
     kubectl get pods
     kubectl get svc my-rest-api-service
     ```
 
-7. **Access the API**: Once the service is successfully deployed and has an external IP address, you can access the API using the provided external IP.
+## Access the API
+
+Once the service is successfully deployed and has an external IP address, you can access the API using the provided external IP.
 
 ## Clean Up
 
