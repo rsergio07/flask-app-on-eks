@@ -60,13 +60,14 @@ resource "aws_security_group" "eks_sg" {
   }
 }
 
-# Create Route Table to route internet-bound traffic through the Internet Gateway
+# Create a set of route resources to route traffic for each subnet in the Amazon EKS VPC
 resource "aws_route_table" "subnet_route_table" {
   count = length(aws_subnet.eks_subnets)
 
   vpc_id = aws_vpc.eks_vpc.id
 }
 
+# Create a set of route resources to route all traffic from each subnet in the Amazon EKS VPC to the Internet Gateway
 resource "aws_route" "subnet_route_to_internet_gateway" {
   count                   = length(aws_subnet.eks_subnets)
   route_table_id          = aws_route_table.subnet_route_table[count.index].id
@@ -142,5 +143,5 @@ resource "aws_eks_node_group" "my_cluster_nodes" {
     min_size     = 1
   }
 
-  instance_types = ["t2.micro"]
+  instance_types = ["t3.micro"]
 }
