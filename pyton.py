@@ -1,7 +1,7 @@
 """
 This script uses boto3 to:
-  - Retrieve instances with tags that have a TTL which will expire in one or three days and notify the owner
-  - Retrieve instances with tags that have a TTL which is set in the past.
+  - Retrieve instances with tags that have a TTL that will expire in one or three days and notify the owner.
+  - Retrieve instances with tags with a TTL set in the past.
 
 Used for temporary environments.
 """
@@ -13,7 +13,6 @@ from botocore.config import Config
 from datetime import datetime
 from email.message import EmailMessage
 from string import Template
-from smtplib import SMTPRecipientsRefused
 
 CONFIG = Config(region_name = "eu-west-1")
 EMAIL_SENDER = "reaqtasaasprovisioning@ibm.com"
@@ -36,6 +35,7 @@ def is_expired(ttl):
 
 def is_running(state):
     return state["Name"] in ["running", "stopped"]
+
 
 def get_expired_instances(instances):
     expired = []
@@ -62,7 +62,8 @@ def check_soon_to_expire_instances(instances_object):
             d1 = datetime.strptime(ttl, '%Y-%m-%d %H:%M:%S')
             delta = d1 - d0
             if delta.days == 3 or delta.days == 1:
-                to_be_expired.append({"instance_id": instance.id, "name": name, "owner": owner, "days_to_expire": delta.days})
+                to_be_expired.append(
+                    {"instance_id": instance.id, "name": name, "owner": owner, "days_to_expire": delta.days})
                 owner_list.append(owner)
 
     owner_list = list(set(owner_list))  # Removing duplicates
@@ -87,7 +88,9 @@ def check_soon_to_expire_instances(instances_object):
 
             msg = msg + f'- <b>{target_instance["name"]}</b> ({target_instance["instance_id"]}) will be terminated {timeframe}<br>'
 
-        send_notification(content=msg, mail_recipient=recipient)
+        # Check if the email was sent successfully and print a message accordingly
+        if not send_notification(content=msg, mail_recipient=recipient):
+            print(f"Failed to send notification to {recipient}")
 
 
 def send_notification(content, mail_recipient):
@@ -96,7 +99,8 @@ def send_notification(content, mail_recipient):
     port = MAIL_PORT
     email_recipient = mail_recipient
 
-    body = update_mail_template(template_path="email_template/instance_termination_notice.html", content=content)
+    body = update_mail_template(
+        template_path="email_template/instance_termination_notice.html", content=content)
 
     mail_msg = EmailMessage()
     mail_msg["Subject"] = "Impending staging servers termination"
@@ -104,7 +108,28 @@ def send_notification(content, mail_recipient):
     mail_msg["To"] = email_recipient
     mail_msg.set_content(body, subtype="html")
 
-# Validate recipient email address
+    try:
+        with smtplib.SMTP(server, port) as smtp_server:
+            smtp_server.send_message(mail_msg)
+            return True  # Return True if the email was sent successfully
+    except smtplib.SMTPException as e:
+        # Handle any SMTP-related errors
+        print(f"Failed to send email: {e}")
+        return False  # Return False if email sending failed
+    except Exception as e:
+        # Handle any other unexpected errors
+        print(f"An unexpected error occurred: {e}")
+        return False  # Return False if email sending failed
+
+
+def update_mail_template(template_path, content):
+    with open(template_path, "r") as f:
+        source = Template(f.read())
+        output = source.substitute({"content": content})
+
+    return output
+
+
 def validate_email(email):
     # Check if email is not empty
     if not email:
@@ -113,34 +138,6 @@ def validate_email(email):
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
         return False
     return True
-
-recipient_email = mail_recipient
-
-if not validate_email(recipient_email):
-    print("Invalid recipient email address")
-else:
-    try:
-        with smtplib.SMTP(server, port) as smtp_server:
-            smtp_server.send_message(mail_msg)
-    except SMTPException as e:
-        # Handle any SMTP-related errors
-        print(f"Failed to send email: {e}")
-    except Exception as e:
-        # Handle any other unexpected errors
-        print(f"An unexpected error occurred: {e}")
-
-
-def update_mail_template(template_path, content):
-
-    with open(template_path, "r") as f:
-        source = Template(f.read())
-        output = source.substitute(
-            {
-                "content": content
-            }
-        )
-
-    return output
 
 
 if __name__ == '__main__':
