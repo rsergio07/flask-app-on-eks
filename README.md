@@ -2,7 +2,7 @@
 
 This project demonstrates how to deploy a Flask web application onto an AWS Elastic Kubernetes Service (EKS) cluster using Terraform for infrastructure provisioning.
 
-## Project Structure v2
+## Project Structure
 
 The project contains the following files:
 
